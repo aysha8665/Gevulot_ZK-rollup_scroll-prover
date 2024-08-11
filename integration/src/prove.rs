@@ -32,8 +32,15 @@ pub fn verify_chunk(
     //     "finish generating chunk snark, elapsed: {:?}",
     //     now.elapsed()
     // );
-
+//=============================================
     let chunk_proof = fs::read(proof_path)use std::fs;;
+
+    let result = ChunkProof::new(
+        snark,
+        self.prover_impl.pk(LayerId::Layer2.id()),
+        chunk_info,
+        row_usage,
+    );
     // output_dir is used to load chunk vk
     env::set_var("CHUNK_VK_FILENAME", "vk_chunk_0.vkey");
     let verifier = new_chunk_verifier(params_path, output_dir);
