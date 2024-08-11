@@ -4,6 +4,7 @@ use prover::{utils::init_env_and_log, ChunkProvingTask};
 use std::env;
 use std::{error::Error, result::Result};
 use gevulot_shim::{Task, TaskResult};
+use crate::{types::base64, zkevm::SubCircuitRowUsage};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -22,6 +23,17 @@ struct Args {
     )]
     trace_path: String,
 }
+
+pub struct ChunkProof {
+    #[serde(with = "base64")]
+    pub protocol: Vec<u8>,
+    #[serde(flatten)]
+    pub proof: Proof,
+    pub chunk_info: ChunkInfo,
+    #[serde(default)]
+    pub row_usages: Vec<SubCircuitRowUsage>,
+}
+
 
 fn main() -> Result<(), Box<dyn Error>> {
     gevulot_shim::run(run_task)
