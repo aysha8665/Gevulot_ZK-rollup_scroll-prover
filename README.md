@@ -1,23 +1,23 @@
 # Scroll Prover Integration with Gevulot
 
-This project demonstrates the integration of the Scroll prover with the Gevulot platform, leveraging the Risc0 zkVM. The integration was completed during .
+This project demonstrates the integration of the Scroll prover with the Gevulot platform. The integration was completed during ZK Hack Montréal.
 
 ## Overview
 
-This repository contains the steps required to build, deploy, and test a Scroll prover on the Gevulot network. The prover can be used to generate zero-knowledge proofs on-chain, showcasing the power and flexibility of integrating ZK-rollups with the Gevulot project.
+This repository contains the steps required to build, deploy, and test a Scroll prover on the Gevulot network. The prover can be used to generate zero-knowledge proofs on-chain.
 
 ## Quick Start
 
 ### Prover Deployment
 
-- **Prover Hash**: `34948922b107eaa8672b3315c830638fc98ade760780dd2f5d9406a14ef6c10a`
-- **Transaction Hash**: `50a1f17c966020b4f85cab002515f367473127372f8e777be4c4e09487d09cc6`
+- **Prover Hash**: `e6d7ba0b6d1ddc7a94b761a3bc8e42cfa2c0368fcd4cba710fde14f366ed447e`
+- **Transaction Hash**: `09191bfaeda2a4e65cd4e0c5a5067c55b8a2f65e9631b142c168cf00065b10f3`
 
 ### Example Transaction
 
 The Scroll prover was successfully deployed and executed on the Gevulot Devnet. Below is an example transaction hash:
 
-- **Transaction Hash**: `3c90fd79ea28803f2d826d23b7c332c1c7be50c95e73fa85472a706ac979784a`
+- **Transaction Hash**: `ebaaf7687f3f9ee62bfa38b83b10637b37645e0ec394a84ef9d54aee38218d35`
 
 ## Deployment Steps
 
@@ -30,33 +30,32 @@ The Scroll prover was successfully deployed and executed on the Gevulot Devnet. 
 ### Building the Prover
 
 1. **Compile the Prover:**
-    ```bash
-    cargo build --release -p prover
-    cp ./target/release/prover_gevulot ./prover_gevulot
+    ```
+    cargo build --release
     ```
 
 ### Preparing the Unikernel Image
 
 1. **Build the Image:**
     ```bash
-    ops build ./prover_gevulot -c manifest_prover.json
+    ops build ./target/release/trace_prover -c manifest_trace_prover.json
     ```
 
     The image file location will be printed by Ops:
     ```
-    Bootable image file: /home/username/.ops/images/prover_gevulot
+    Bootable image file: /home/username/.ops/images/trace_prover
     ```
 
 ### Calculating the Image Hash
 
 1. **Compute the Hash:**
     ```bash
-    gevulot-cli calculate-hash --file ~/.ops/images/prover_gevulot
+    gevulot-cli calculate-hash --file ~/.ops/images/trace_prover
     ```
 
     The resulting hash will be:
     ```
-    The hash of the file is: f37b73d5b9c1108a4ee5276a880cdba0cd97c71997cd37884c4c7ab87f340517
+    The hash of the file is: 6575a685399c4bf0709c395b3631a5c121e0ff6b7c2d3f572ad80c9fc29a039e
     ```
 
 ### Uploading the Image
@@ -68,51 +67,34 @@ The Scroll prover was successfully deployed and executed on the Gevulot Devnet. 
 
 1. **Deploy the Prover:**
     ```bash
-    gevulot-cli --jsonurl "http://api.devnet.gevulot.com:9944" --keyfile /tmp/localkey.pki \
-    deploy \
-    --name "Scroll Prover Integration" \
-    --prover f37b73d5b9c1108a4ee5276a880cdba0cd97c71997cd37884c4c7ab87f340517 \
-    --provername 'scrollprover' \
-    --proverimgurl 'https://storage.googleapis.com/gevulot-test/scroll/prover_gevulot'
+    gevulot-cli --jsonurl "http://api.devnet.gevulot.com:9944" --keyfile ./localkey.pki \
+deploy \
+--name "Simple Gevulot test prover & verifier A-Z" \
+--prover 6575a685399c4bf0709c395b3631a5c121e0ff6b7c2d3f572ad80c9fc29a039e \
+--provername '#testprover' \
+--proverimgurl 'https://github.com/aysha8665/Test/releases/download/v1.0.0/trace_prover' \
+--verifier c8d90de9418502c30b30a0284f804cc5fc95509482e5c4143f26b7539812c1c1 \
+--verifiername '#testverifier' \
+--verifierimgurl 'https://storage.googleapis.com/gevulot-devnet-deployments/test-1/verifier'
+Start prover / verifier deployment
+Prover / Verifier deployed correctly.
+Prover hash:e6d7ba0b6d1ddc7a94b761a3bc8e42cfa2c0368fcd4cba710fde14f366ed447e
+Verifier hash:09191bfaeda2a4e65cd4e0c5a5067c55b8a2f65e9631b142c168cf00065b10f3.
+Tx Hash:ebaaf7687f3f9ee62bfa38b83b10637b37645e0ec394a84ef9d54aee38218d35
     ```
 
 ### Testing the Deployment
 
 1. **Run Example Workload:**
 
-   After successful deployment, you can initiate a sample run using the following commands:
+   After successful deployment, initiate a sample run using the following commands:
 
-   - **Setup Guest:**
-     ```bash
-     cargo build --release -p example-workload-input
-     cp ./target/riscv-guest/riscv32im-risc0-zkvm-elf/release/square_check_guest /tmp/workload-guest.bin
-     ```
-
-   - **Prepare Input:**
-     ```bash
-     cargo run --release -p example-workload-input > /tmp/workload-input.json
-     ```
-
-   - **Run the Prover:**
-     ```bash
-     cargo run -p prover --bin prover -- --guest /tmp/workload-guest.bin --input /tmp/workload-input.json --output /tmp/workload-receipt.bin
-     ```
-
-   - **Verify Locally:**
-     ```bash
-     cargo run -p verifier --bin verifier -- --guest /tmp/workload-guest.bin --receipt /tmp/workload-receipt.bin
-     ```
-
-   This should output a valid proof.
 
 ### Executing on Gevulot
 
 1. **Execute Proof Generation:**
     ```bash
-    gevulot-cli --jsonurl "http://api.devnet.gevulot.com:9944" --keyfile /tmp/localkey.pki \
-    exec --tasks '[{"program":"34948922b107eaa8672b3315c830638fc98ade760780dd2f5d9406a14ef6c10a","cmd_args":[{"name":"--guest","value":"/workspace/workload-guest.bin"},{"name":"--input","value":"/workspace/workload-input.json"},{"name":"--output","value":"/workspace/workload-receipt.bin"}],"inputs":[{"Input":{"local_path":"1e7d80754b7f9f8cf0bc5b423feb03baacd4e2a533333581f0ab713a75e52afb","vm_path":"/workspace/workload-guest.bin","file_url":"https://storage.googleapis.com/gevulot-test/workload-guest.bin"}},{"Input":{"local_path":"e51bf918d5d85b49283a096ccb25afb0d2089fec2701b5d9f79437b58cd39660","vm_path":"/workspace/workload-input.json","file_url":"https://storage.googleapis.com/gevulot-test/workload-input.json"}}]}]'
+
     ```
 
-## Conclusion
 
-This integration demonstrates the capability of the Scroll prover running on the Gevulot platform, paving the way for advanced zero-knowledge proof systems to operate seamlessly on-chain.
