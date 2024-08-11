@@ -2,6 +2,8 @@ use clap::Parser;
 use integration::{prove::prove_and_verify_chunk, test_util::load_chunk};
 use prover::{utils::init_env_and_log, ChunkProvingTask};
 use std::env;
+use std::{error::Error, result::Result};
+use gevulot_shim::{Task, TaskResult};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -21,14 +23,38 @@ struct Args {
     trace_path: String,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
+    gevulot_shim::run(run_task)
+}
+
+// The main function that executes the prover program.
+fn run_task(task: Task) -> Result<TaskResult, Box<dyn Error>> {
+    // Display program arguments we received. These could be used for
+    // e.g. parsing CLI arguments with clap.
+    println!("prover: task.args: {:?}", &task.args);
+    // -----------------------------------------------------------------------
+    // Here would be the control logic to run the prover with given arguments.
+    // -----------------------------------------------------------------------
+
     // Layer config files are located in `./integration/configs`.
     env::set_current_dir("./integration").unwrap();
     let output_dir = init_env_and_log("trace_prover");
     log::info!("Initialized ENV and created output-dir {output_dir}");
+    
+    //let args = Args::parse_from(task.args);//Args::parse();
+    // `task.args` contains only the task args, which doesn't include the binary
+    // name. To use existing CLI args parser, create a Vec<String> of args,
+    // including the binary name.
+    let mut args_with_bin_name = vec![std::env::args()
+    .collect::<Vec<String>>()
+    .first()
+    .unwrap()
+    .clone()];
+    args_with_bin_name.append(&mut task.args.clone());
 
-    let args = Args::parse();
-
+    // Parse the cli args.
+    let args = Args::parse_from(args_with_bin_name);
+    
     let traces = load_chunk(&args.trace_path).1;
     prover::eth_types::constants::set_scroll_block_constants_with_trace(&traces[0]);
     let chunk = ChunkProvingTask::from(traces);
@@ -40,4 +66,10 @@ fn main() {
         &output_dir,
     );
     log::info!("chunk prove done");
+    
+    // Write generated proof to a file.
+    std::fs::write("/workspace/proof.dat", b"this is a proof.")?;
+
+    // Return TaskResult with reference to the generated proof file.
+    task.result(vec![], vec![String::from("/workspace/proof.dat")])
 }
