@@ -29,6 +29,10 @@ name = "trace_prover"
 path = "src/trace_prover.rs"
 
 [[bin]]
+name = "trace_verifier"
+path = "src/trace_verifier.rs"
+
+[[bin]]
 name = "chain_prover"
 path = "src/chain_prover.rs"
 
