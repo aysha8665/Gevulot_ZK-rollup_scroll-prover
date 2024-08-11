@@ -18,6 +18,8 @@ serde.workspace = true
 serde_derive.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
+gevulot-shim = { git = "https://github.com/gevulotnetwork/gevulot-shim.git" }
+
 
 prover.workspace = true
 integration.workspace = true
