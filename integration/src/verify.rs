@@ -5,10 +5,6 @@ use prover::{
 };
 use std::{env, time::Instant};
 use crate::deserialize::load_chunk_proof_from_file;
-//use crate::deserialize::load_chunk_proof_from_file;
-// use scroll-prover::ChunkProof;
-
-// use prover::{utils::init_env_and_log, SubCircuitRowUsage};
 
 
 /// The `output_dir` is assumed to output_dir of chunk proving.
@@ -19,21 +15,13 @@ pub fn new_batch_prover(output_dir: &str) -> BatchProver {
 
     prover
 }
+
 pub fn verify_chunk(
-    //chunk: ChunkProvingTask,
-    //chunk_identifier: Option<&str>,
     params_path: &str,
     proof_path: &str,
     output_dir: &str,
 ) {
-    // let mut prover = ChunkProver::from_dirs(params_path, assets_path);
-    // log::info!("Constructed chunk prover");
-
-    // let now = Instant::now();
-    // let chunk_proof = load_chunk_proof_from_file("output.json");
-    // println!("{:?}", chunk_proof);
-
-    if let Ok(chunk_proof) = load_chunk_proof_from_file("output.json") {
+    if let Ok(chunk_proof) = load_chunk_proof_from_file(proof_path) {
         println!("{:?}", chunk_proof);
         env::set_var("CHUNK_VK_FILENAME", "vk_chunk_0.vkey");
         let verifier = new_chunk_verifier(params_path, output_dir);
@@ -43,14 +31,7 @@ pub fn verify_chunk(
         eprintln!("Failed to load chunk proof");
     }
    
-//=============================================
-    //const chunk_proof = fs::read(proof_path);
-
-   // let result = 
-    // output_dir is used to load chunk vk
-
 }
-
 
 pub fn prove_and_verify_chunk(
     chunk: ChunkProvingTask,
