@@ -1,0 +1,3 @@
+[submodule "zkevm-circuits"]
+	path = zkevm-circuits
+	url = https://github.com/aysha8665/zkevm-circuits.git
