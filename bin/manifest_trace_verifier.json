@@ -1,0 +1,13 @@
+{
+    "ManifestPassthrough": {
+      "readonly_rootfs": "true"
+    },
+    "Env":{
+      "RUST_BACKTRACE": "1",
+      "RUST_LOG": "debug"
+    },
+    "Program":"target/release/trace_verifier",
+    "Mounts": {
+      "%1": "/workspace"
+    }
+  }
