@@ -42,7 +42,7 @@ fn run_task(task: Task) -> Result<TaskResult, Box<dyn Error>> {
     // -----------------------------------------------------------------------
     // Layer config files are located in `./integration/configs`.
     env::set_current_dir("./integration").unwrap();
-    let output_dir = init_env_and_log("trace_prover");
+    let output_dir = init_env_and_log("trace_verifier");
     log::info!("Initialized ENV and created output-dir {output_dir}");
     
     //let args = Args::parse_from(task.args);//Args::parse();
@@ -58,10 +58,6 @@ fn run_task(task: Task) -> Result<TaskResult, Box<dyn Error>> {
 
     // Parse the cli args.
     let args = Args::parse_from(args_with_bin_name);
-    
-    let traces = load_chunk(&args.trace_path).1;
-    prover::eth_types::constants::set_scroll_block_constants_with_trace(&traces[0]);
-    let chunk = ChunkProvingTask::from(traces);
 
     verify_chunk(// same with `make test-chunk-prove`, to load vk
         &args.params_path,
