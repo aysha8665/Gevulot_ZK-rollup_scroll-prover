@@ -4,7 +4,7 @@ use prover::{
     BundleProvingTask, ChunkProvingTask,
 };
 use std::{env, time::Instant};
-use std::fs;
+use crate::serialization::{save_chunk_proof_to_file};
 
 /// The `output_dir` is assumed to output_dir of chunk proving.
 pub fn new_batch_prover(output_dir: &str) -> BatchProver {
@@ -14,40 +14,6 @@ pub fn new_batch_prover(output_dir: &str) -> BatchProver {
 
     prover
 }
-pub fn verify_chunk(
-    //chunk: ChunkProvingTask,
-    //chunk_identifier: Option<&str>,
-    params_path: &str,
-    proof_path: &str,
-    output_dir: &str,
-) {
-    // let mut prover = ChunkProver::from_dirs(params_path, assets_path);
-    // log::info!("Constructed chunk prover");
-
-    // let now = Instant::now();
-    // let chunk_proof = prover
-    //     .gen_chunk_proof(chunk, chunk_identifier, None, Some(output_dir))
-    //     .expect("cannot generate chunk snark");
-    // log::info!(
-    //     "finish generating chunk snark, elapsed: {:?}",
-    //     now.elapsed()
-    // );
-//=============================================
-    let chunk_proof = fs::read(proof_path)use std::fs;;
-
-    let result = ChunkProof::new(
-        snark,
-        self.prover_impl.pk(LayerId::Layer2.id()),
-        chunk_info,
-        row_usage,
-    );
-    // output_dir is used to load chunk vk
-    env::set_var("CHUNK_VK_FILENAME", "vk_chunk_0.vkey");
-    let verifier = new_chunk_verifier(params_path, output_dir);
-    assert!(verifier.verify_snark(chunk_proof.to_snark()));
-    log::info!("Verified chunk proof");
-}
-
 
 pub fn prove_and_verify_chunk(
     chunk: ChunkProvingTask,
@@ -60,13 +26,15 @@ pub fn prove_and_verify_chunk(
     log::info!("Constructed chunk prover");
 
     let now = Instant::now();
-    let chunk_proof = prover
+    let chunk_proof: prover::ChunkProof = prover
         .gen_chunk_proof(chunk, chunk_identifier, None, Some(output_dir))
         .expect("cannot generate chunk snark");
     log::info!(
         "finish generating chunk snark, elapsed: {:?}",
         now.elapsed()
     );
+
+    save_chunk_proof_to_file(&chunk_proof, "output.json");
 
     // output_dir is used to load chunk vk
     env::set_var("CHUNK_VK_FILENAME", "vk_chunk_0.vkey");
